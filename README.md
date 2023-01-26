@@ -1,4 +1,4 @@
-# M1 ALMA - Projet de Programmation par contrainte : ...
+# M1 - Projet de Programmation par contrainte : Cyclic-bandwidth problem
 
 Programmation par Contraintes (X2I2010) - Prof. Eric Monfroy
 
@@ -27,4 +27,3 @@ cd ../../
 python -m pip install -r requirements.txt
 cd src/
 ```
-"test"
