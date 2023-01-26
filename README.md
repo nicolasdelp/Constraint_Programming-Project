@@ -9,7 +9,7 @@ Programmation par Contraintes (X2I2010) - Prof. Eric Monfroy
 **Windows**
 
 ```
-python -m venv env
+py -m venv env
 cd env/Scripts/
 activate.bat
 cd ../../
