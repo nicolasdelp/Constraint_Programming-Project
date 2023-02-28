@@ -1,7 +1,6 @@
 from pycsp3 import *
 
-# Instance didactique
-n = 5
+n, E, edges = data
 
 
 # Nos étiquettes
@@ -16,10 +15,9 @@ print("Domain of any variable: ", e[0].dom)
 
 satisfy(
     AllDifferent(e)
-);
+)
 
-# Fonction objective
+# Fonction objectif
 minimize(
     Maximum( min( abs( e[i]-e[j], n - abs( e[i]-e[j] )) for i,j in n))
 )
-print(objective())
