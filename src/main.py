@@ -4,7 +4,6 @@ from pycsp3 import *
 n = 5
 
 
-
 # Nos étiquettes
 etiq = [i+1 for i in range(n)] 
 
