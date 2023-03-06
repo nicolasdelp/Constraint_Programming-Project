@@ -2,8 +2,8 @@ from pycsp3 import *
 
 k = 1 # Valeur par défaut du cyclic-bandwidth
 
-# We check if k wasn't given as argument (presence of k=<number> when calling
-# model2.py). If it is the case then we consider that k over the default value of k
+# On vérifie si k n'a pas été donné comme entrée (présence de k=<un nombre> à l'appel de
+# model2.py). Si c'est le cas, on prendra alors le k donné au lieu de celui par défaut
 expr_k = "k=[0-9]+"
 rule = re.compile(expr_k)
 for arg in sys.argv[1:]:
