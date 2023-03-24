@@ -1,9 +1,10 @@
 from pycsp3 import *
 
-n, E, edges = data
+# V = nombre de sommets | E = nombre d'arêtes | edges = les arètes
+V, E, edges = data
 
 # Variables de décision
-x = VarArray(size=n, dom=range(n))
+x = VarArray(size=V, dom=range(V))
 
 # Contraintes
 satisfy(
@@ -12,5 +13,5 @@ satisfy(
 
 # Fonction objectif
 minimize(
-   Maximum(Minimum(abs(x[u] - x[v]), n - abs(x[u] - x[v])) for u, v in edges)
+   Maximum(Minimum(abs(x[i] - x[j]), V - abs(x[i] - x[j])) for i, j in edges)
 )
