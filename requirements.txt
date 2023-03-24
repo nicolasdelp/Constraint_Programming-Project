@@ -1,1 +1,3 @@
 pycsp3
+numpy
+python-sat[pblib,aiger]
