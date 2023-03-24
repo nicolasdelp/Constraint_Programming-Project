@@ -27,3 +27,7 @@ cd ../../
 python -m pip install -r requirements.txt
 cd src/
 ```
+
+Commande exemple pour RUN
+
+```python model1.py -data="../json/494_bus.json" -output="../instances/494_bus.xml" -solve```
