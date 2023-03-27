@@ -1,3 +1,4 @@
+from pycsp3 import *
 
 # V = nombre de sommets | E = nombre d'arêtes | edges = les arètes
 V, E, edges = data

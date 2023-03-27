@@ -18,4 +18,5 @@ table = {
 satisfy(
     AllDifferent(x),
     [(x[i], x[j]) in table for i, j in edges]
+    (x[0] == 0)  # on peut fixer la position du premier sommet à 0 sans perte de généralité
 )
