@@ -1,5 +1,5 @@
-from pysat.solvers import Glucose4
-from pysat.formula import CNF
+from pycsp3 import *
+
 
 # V = nombre de sommets | E = nombre d'arêtes | edges = les arètes
 V, E, edges = data
@@ -33,7 +33,7 @@ for (i, j) in edges:
             cnf.append(clause)
 
 # Résolution du problème en utilisant Glucose 4
-with Glucose4(bootstrap_with=cnf) as solver:
+with Glucose3(bootstrap_with=cnf) as solver:
     if solver.solve():
         model = solver.get_model()
         solution = [0] * V
