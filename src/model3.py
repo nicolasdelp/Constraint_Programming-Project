@@ -4,7 +4,10 @@ from pycsp3 import *
 V, E, edges = data
 
 # Valeur par défaut du cyclic-bandwidth
-k = 10 
+k = 1
+
+# lecture de k
+k = int(sys.argv[1])
 
 # Variables booléennes
 x = [[ Var(id=f"x_{i}_{j}", dom=[False, True]) for j in range(V)] for i in range(V)]
