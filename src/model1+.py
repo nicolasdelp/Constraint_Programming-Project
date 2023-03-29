@@ -6,13 +6,13 @@ V, E, edges = data
 # Variables de décision
 x = VarArray(size=V, dom=range(V))
 
-# Contraintes en éliminant les symétries
+# Contraintes (avec élimination des symétries)
 satisfy(
-    x[0] == 1 
+    x[0] == 1,
     x[2] < x[V-1],
     AllDifferent(x)
 )
-
+# Fonction objectif
 minimize(
    Maximum(Minimum(abs(x[u] - x[v]), V - abs(x[u] - x[v])) for u, v in edges)
 )

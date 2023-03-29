@@ -18,7 +18,7 @@ table = {
                     if min(abs(i - j), V - abs(i - j)) <= k and i != j
         }
 
-
+# Contraintes
 satisfy(
     # Assure que chaque variable x[i] est différente des autres variables x[j]
     AllDifferent(x),

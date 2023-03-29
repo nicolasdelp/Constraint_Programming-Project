@@ -9,16 +9,16 @@ k = 10
 # Variables de décision
 x = VarArray(size=V, dom=range(V))
 
-# Table de contraintes pour le problème. Cette table contient tous les paires (i, j) 
-# de sommets tels que la distance cyclique entre i et j (c'est-à-dire la distance minimale sur le cycle)
-# est inférieure ou égale à k. Cette table est utilisée dans la contrainte 2
+# Table de contraintes pour le problème. 
+# Cette table contient tous les paires (i, j) de sommets tels que la distance cyclique entre i et j 
+# (c'est-à-dire la distance minimale sur le cycle) est inférieure ou égale à k.
 table = {
     (i, j) for i in range(V) 
                 for j in range(V)
                     if min(abs(i - j), V - abs(i - j)) <= k and i != j
         }
 
-# Satisfaire les contraintes tout en éliminant les symétries
+# Contraintes (avec élimination des symétries)
 satisfy(
     x[0] == 1,
     x[2] < x[V-1],
