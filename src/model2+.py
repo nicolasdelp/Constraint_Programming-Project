@@ -4,7 +4,10 @@ from pycsp3 import *
 V, E, edges = data
 
 # Valeur par défaut du cyclic-bandwidth (largeur max de la bande cyclique)
-k = 10 
+k = 1
+
+# lecture de k
+k = int(sys.argv[1])
 
 # Variables de décision
 x = VarArray(size=V, dom=range(V))
