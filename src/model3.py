@@ -1,56 +1,88 @@
-from pycsp3 import *
+from pysat.solvers import Glucose4
+from pysat.formula import CNF
+import json
+import sys
 
-# V = nombre de sommets | E = nombre d'arêtes | edges = les arètes
-V, E, edges = data
+# Choix du solveur
+solver = Glucose4()
 
-# Valeur par défaut du cyclic-bandwidth
-k = 1
+# Lecture des données depuis le fichier Json
+data = json.load(open(sys.argv[2], 'r'))
 
-# lecture de k
+V = data['V']
+E = data['E']
+edges = data['edges']
+
+# Lecture de la valeur de k
 k = int(sys.argv[1])
 
-# Variables booléennes
-x = [[ Var(id=f"x_{i}_{j}", dom=[False, True]) for j in range(V)] for i in range(V)]
+def cyclic_bandwidth_problem(n, E, edges, k):
 
-# Contrainte de présence
-cnf = CNF()
-for i in range(V):
-    clause = [x[i][j] for j in range(V)]
-    cnf.append(clause)
-
-# Contrainte de différence
-for i in range(V):
-    for j in range(i+1, V):
-        for k in range(V):
-            clause1 = [-x[i][k], -x[j][(k + i - j) % V]]
-            clause2 = [-x[j][k], -x[i][(k + j - i) % V]]
-            cnf.append(clause1)
-            cnf.append(clause2)
-
-# Contrainte de bande passante cyclique
-for (i, j) in edges:
-    for d in range(-k, k+1):
-        if d != 0:
-            clause = [-x[i][(j + d) % V], -x[j][(i + d) % V]]
-            cnf.append(clause)
-
-# Résolution du problème en utilisant Glucose 4
-with Glucose3(bootstrap_with=cnf) as solver:
+    # Création de la formule CNF
+    cnf = CNF()
+    
+    # Création des variables booléennes
+    variables = {}
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            variables[(i, j)] = len(variables) + 1
+    
+    # Contrainte 1 : T est toujours vrai
+    cnf.append([variables[(1, 1)]])
+    
+    # Contrainte 2 : Au moins une étiquette pour chaque sommet
+    for i in range(1, n+1):
+        clause = []
+        for j in range(1, n+1):
+            clause.append(variables[(i, j)])
+        cnf.append(clause)
+    
+    # Contrainte 3 : Deux sommets éloignés de plus de k ne peuvent pas avoir la même étiquette
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            for h in range(1, n+1):
+                if h != i:
+                    for d in range(1, k+1):
+                        if j-d >= 1:
+                            cnf.append([-variables[(i, j)], -variables[(h, j-d)]])
+                        if j+d <= n:
+                            cnf.append([-variables[(i, j)], -variables[(h, j+d)]])
+    
+    # Contrainte 4 : Deux sommets adjacents ne peuvent pas avoir des labels incompatibles
+    for (u, v) in E:
+        for i in range(1, n+1):
+            for j in range(1, n+1):
+                if not edges[u][v][(i-1)%n][(j-1)%n]:
+                    cnf.append([-variables[(u, i)], -variables[(v, j)]])
+    
+    # Contrainte 5 : Éviter les contraintes redondantes
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            for k in range(1, n+1):
+                if k != j:
+                    cnf.append([-variables[(i, j)], -variables[(i, k)]])
+    
+    # Ajout de la variable y pour la satisfaction des contraintes
+    y = len(variables) + 1
+    cnf.append([y])
+    for i in range(1, n+1):
+        for j in range(1, n+1):
+            cnf.append([-y, variables[(i, j)]])
+    
+    # Création du solveur et résolution du problème
+    solver = Glucose4()
+    solver.append_formula(cnf)
     if solver.solve():
-        model = solver.get_model()
-        solution = [0] * V
-        for i in range(V):
-            for j in range(V):
-                if model[x[i][j]-1] > 0:
-                    solution[j] = i
-        print("Solution:", solution)
+        print("La contrainte de cyclic-bandwidth k =", k, "est satisfaite")
+        # Récupération de la solution
+        solution = []
+        for i in range(1, n+1):
+            for j in range(1, n+1):
+                if solver.model[variables[(i, j)]-1] > 0:
+                    solution.append((i, j))
+        print("Sat")
     else:
-        print("Le problème est insatisfaisable")
+        print("La contrainte est insatisfaite")
 
-
-
-# TODO
-# Utiliser la table inverse pour être en CNF
-# Trouver une propriété pour optimiser OU dicotomie
-# Mettre le solveur dans le model
-# py model1.py -data="..." -model=""
+e = cyclic_bandwidth_problem(V, E, edges, k)
+print(e)

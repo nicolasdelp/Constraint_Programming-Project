@@ -1,10 +1,17 @@
-from pycsp3 import *
+import pysat.formula as f
+from pysat.solvers import Glucose4
+import sys
+import json
 
-# V = nombre de sommets | E = nombre d'arêtes | edges = les arètes
-V, E, edges = data
+# Choix du solveur
+solver = Glucose4()
 
-# Valeur par défaut du cyclic-bandwidth
-k = 1
+# Lecture des données depuis le fichier Json
+data = json.load(open(sys.argv[2], 'r'))
 
-# lecture de k
+V = data['V']
+E = data['E']
+edges = data['edges']
+
+# Lecture de la valeur de k
 k = int(sys.argv[1])
