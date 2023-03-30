@@ -30,4 +30,5 @@ cd src/
 
 Commande exemple pour RUN
 
-```python model1.py -data="../json/494_bus.json" -output="../instances/494_bus.xml" -solve```
+```python3 model1.py -data="../json/arc130.json" -solve```
+```python3 model2.py 3 -data="../json/arc130.json" -solve```
