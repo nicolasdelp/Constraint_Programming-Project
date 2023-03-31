@@ -93,12 +93,6 @@ for i in range(V-1):
                     if k != i:
                         cnf.append([-X[i][k-1], -X[j][(k-1)]])
 
-P = np.full((V, V), False)
-for i in range(V):
-    for j in range(V):
-        if min(abs(j - i), V - abs(j - i)) <= k:
-            P[i][j] = True
-            X[i][j] = True
 
 #Résultat
 if solver.solve():
