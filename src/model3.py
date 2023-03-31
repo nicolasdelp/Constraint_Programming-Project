@@ -17,7 +17,9 @@ edges = data['edges']
 
 # Lecture de la valeur de k
 k = int(sys.argv[1])
-
+if k < 1:
+    print("Erreur : veuillez donner un k > 0")
+    sys. exit()
 
 # Début du timer
 start = time.time()
