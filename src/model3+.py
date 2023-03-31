@@ -1,7 +1,12 @@
 import json
+from pysat.solvers import Glucose4, Solver
+from pysat.formula import CNF
 import time
 import sys
-from pysat.solvers import Glucose4
+import numpy as np
+
+
+solve = False
 
 # Lecture des données depuis le fichier Json
 data = json.load(open(sys.argv[2], 'r'))
@@ -9,56 +14,98 @@ V = data['V']
 E = data['E']
 edges = data['edges']
 
+
 # Lecture de la valeur de k
 k = int(sys.argv[1])
+
 
 # Début du timer
 start = time.time()
 
-# Créer un solveur SAT
+
+# Initialisatio du solveur
 solver = Glucose4()
 
-# Créer une variable booléenne pour chaque permutation possible des sommets
-perms = {}
+
+# Initialisation de la variable booléenne X[i][j]
+X = [[False for i in range(V)] for j in range(V)]
+
+ 
+P = np.full((V, V), False)
 for i in range(V):
     for j in range(V):
-        perms[(i, j)] = solver.nof_vars()
+        if min(abs(j - i), V - abs(j - i)) <= k:
+            P[i][j] = True
 
-# Contraintes de domaine: chaque variable doit être soit vraie, soit fausse
+# Initialisation des clauses
+cnf = CNF()
+
+
+# Ajout des clauses pour chaque sommet i
+for i in range(V):
+    # chaque sommet doit avoir au moins une étiquette
+    clause = [X[i][j] for j in range(V)]
+    cnf.append(clause)
+    
+    # chaque étiquette j ne peut être utilisée qu'une seule fois pour tous les sommets i
+    for j1 in range(V):
+        for j2 in range(j1+1, V):
+            clause = [-X[i][j1], -X[i][j2]]
+            cnf.append(clause)
+
+
+# Ajout des clauses pour chaque étiquette j
+for j in range(V):
+    # chaque étiquette j doit être assignée à un et un seul sommet i
+    clause = [X[i][j] for i in range(V)]
+    cnf.append(clause)
+    
+    # chaque sommet i ne peut avoir qu'une seule étiquette assignée
+    for i1 in range(V):
+        for i2 in range(i1+1, V):
+            clause = [-X[i1][j], -X[i2][j]]
+            cnf.append(clause)
+
+
+
+
+# Ajout des clauses pour chaque paire de sommets (i, j) telle que i != j
 for i in range(V):
     for j in range(V):
-        solver.add_clause([perms[(i, j)], -perms[(i, j)]])
+        if i != j:
+            # chaque paire de sommets (i, j) ne peut pas être éloignée de plus de k
+            for l in range(1, k+1):
+                if j+l < V:
+                    cnf.append([-X[i][j], -X[j+l][i]])
+                if i+l < V:
+                    cnf.append([-X[i][j], -X[j][i+l]])
 
-# Contraintes de cycle: chaque sommet doit apparaître exactement une fois dans chaque cycle
+
+
+# Deux sommets éloignés de plus de k ne peuvent pas avoir la même étiquette
+# (pour chaque paire de sommets i et j différents, si la distance 
+# entre eux est supérieure à k, alors pour tout entier k entre 1 et k,
+# il ne peut pas être vrai que les sommets i et j ont l'étiquette k.
+for i in range(V-1):
+    for j in range(V-1):
+        if i != j:
+            for k in range(1, V-1):
+                    if k != i:
+                        cnf.append([-X[i][k-1], -X[j][(k-1)]])
+
+P = np.full((V, V), False)
 for i in range(V):
-    cycle_vars = []
     for j in range(V):
-        cycle_vars.append(perms[(i, j)])
-    solver.add_clause(cycle_vars)
+        if min(abs(j - i), V - abs(j - i)) <= k:
+            P[i][j] = True
+            X[i][j] = True
 
-# Contraintes de largeur de bande: pour chaque arête, la différence entre les positions de ses extrémités
-# doit être inférieure ou égale à k
-for edge in edges:
-    u, v = edge
-    for i in range(V):
-        for j in range(V):
-            if i < j:
-                if (i == u and j == v) or (i == v and j == u):
-                    continue
-                # Si les deux sommets ne sont pas voisins dans l'arête, leur différence doit être supérieure à k
-                if abs(i - j) > k + 1:
-                    solver.add_clause([-perms[(i, u)], -perms[(j, v)]])
-                    solver.add_clause([-perms[(i, v)], -perms[(j, u)]])
-                # Sinon, leur différence doit être inférieure ou égale à k
-                else:
-                    solver.add_clause([perms[(i, u)], perms[(j, v)]])
-                    solver.add_clause([perms[(i, v)], perms[(j, u)]])
-
-# Vérifier si le problème est satisfaisable
+#Résultat
 if solver.solve():
     print("Le problème est satisfaisable.")
 else:
     print("Le problème est insatisfaisable.")
 
+# Afficher le temps d'exécution
 end = time.time()
 print("Temps d'execution :", end - start)
