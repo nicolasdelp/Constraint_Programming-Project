@@ -1,4 +1,4 @@
-# M1 - Projet de Programmation par contrainte : Cyclic-bandwidth problem
+# M1 - Projet de Programmation par contraintes : Cyclic-bandwidth problem
 
 Programmation par Contraintes (X2I2010) - Prof. Eric Monfroy
 
